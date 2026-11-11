@@ -1,0 +1,18 @@
+:root { --bg: #f4f5f7; --fg: #1b1f24; --kar: #fff; --ak: #0b5cad; --ram: #c9ced6; --chyba: #b3261e; }
+@media (prefers-color-scheme: dark) { :root { --bg: #14171a; --fg: #e8eaed; --kar: #1e2227; --ak: #6cb0ff; --ram: #3a4048; --chyba: #ff8a80; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.5 system-ui, sans-serif; }
+main { max-width: 640px; margin: 0 auto; padding: 16px; }
+header { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+h1 { font-size: 1.4rem; margin: 0; }
+.verze { font-size: .85rem; opacity: .7; }
+.pruh { background: #fff3c4; color: #4a3b00; padding: 8px 12px; border-radius: 6px; }
+.karta { background: var(--kar); border: 1px solid var(--ram); border-radius: 10px; padding: 16px; margin-top: 12px; }
+label { display: block; margin: 8px 0; }
+input, select, textarea { display: block; width: 100%; padding: 10px; margin-top: 4px; font: inherit; color: inherit; background: var(--bg); border: 1px solid var(--ram); border-radius: 6px; }
+button { padding: 10px 16px; margin: 8px 8px 0 0; font: inherit; color: #fff; background: var(--ak); border: 0; border-radius: 6px; cursor: pointer; }
+button.druhotne { background: transparent; color: var(--ak); border: 1px solid var(--ak); }
+button:disabled { opacity: .5; cursor: not-allowed; }
+.seznam { padding-left: 18px; }
+.chyby { color: var(--chyba); }
+.napoveda, .zprava { font-size: .9rem; opacity: .85; }

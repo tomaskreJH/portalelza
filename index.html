@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="cs"><head><meta charset="utf-8"><title>Portál ELZA (beta)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<!-- CSP (VP kap. 5): jen vlastní soubory. Doména předávací služby se přidá do connect-src až ve verzi, která zapíná provoz (docs/architektura.md). -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'">
+<link rel="stylesheet" href="src/styl.css">
+</head><body>
+<main id="app">Načítám…</main>
+<script type="module" src="src/main.js"></script>
+</body></html>

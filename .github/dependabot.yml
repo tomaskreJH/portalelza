@@ -1,0 +1,12 @@
+# Týdenní kontrola zastaralých knihoven (VP kap. 5). Návrhy chodí jako PR do větve beta.
+# Nikdy neslučovat automaticky: PR otestuje CI, sloučí vlastník po kontrole.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: "/"
+    target-branch: beta
+    schedule: { interval: weekly }
+  - package-ecosystem: github-actions
+    directory: "/"
+    target-branch: beta
+    schedule: { interval: weekly }

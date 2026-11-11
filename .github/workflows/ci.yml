@@ -1,0 +1,79 @@
+# Testy a nasazení (VP kap. 3–5): main = stabilní (kořen webu), beta = 🧪 beta (složka beta/).
+# Před nasazením: npm ci, testy, kontrola závislostí, test pravidel databáze v emulátoru (jen když je firestore.rules).
+# Actions připnuté na commit (SHA + verze v komentáři), aktualizuje Dependabot. Jiný typ aplikace než web: job deploy smazat.
+name: CI a nasazení
+
+on:
+  push:
+    branches: [main, beta]
+  pull_request:
+  workflow_dispatch:
+
+permissions: {}
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Testy
+        run: npm test
+      - name: Kouřový test (když existuje)
+        run: npm run smoke --if-present
+      - name: Kontrola závislostí
+        run: npm audit --audit-level=high
+      - name: Java pro emulátor (jen Firebase)
+        if: hashFiles('firestore.rules') != ''
+        uses: actions/setup-java@77dd5b2ce225ea11469928ac317850245a74ae78 # v6.2.0
+        with:
+          distribution: temurin
+          java-version: 21
+      - name: Pravidla databáze v emulátoru (jen Firebase)
+        if: hashFiles('firestore.rules') != ''
+        run: npx --yes firebase-tools emulators:exec --only firestore "npm run test:rules"
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { ref: main, path: main, persist-credentials: false }
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        continue-on-error: true
+        with: { ref: beta, path: beta, persist-credentials: false }
+      - name: Složit web
+        run: |
+          set -e
+          mkdir -p _site
+          rsync -a --exclude '.git' --exclude '.github' --exclude 'tests' --exclude 'node_modules' --exclude 'docs' main/ _site/
+          if [ -f beta/index.html ]; then
+            mkdir -p _site/beta
+            rsync -a --exclude '.git' --exclude '.github' --exclude 'tests' --exclude 'node_modules' --exclude 'docs' beta/ _site/beta/
+          fi
+          touch _site/.nojekyll
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with: { path: _site }
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
